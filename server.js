@@ -66,7 +66,7 @@ app.get("/api/display/:id", async (req, res) => {
 
   try {
     // Call your Flask API instead of running Python
-    const response = await axios.get(`http://localhost:10000/grades`, {
+    const response = await axios.get(`https://gradify-utilities.onrender.com/`, {
       params: { apogee: apogeeId }
     });
 
