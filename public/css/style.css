@@ -1,0 +1,137 @@
+.description {
+    font-size: 30px;
+    padding-bottom: 30px;
+}
+body {
+    color: white;
+    background-color: black;
+}
+.round {
+    border-radius: 100px;
+    height: 80px;
+    padding-left: 30px;
+    font-size: larger;
+}
+.round2 {
+    border-radius: 100px;
+    height: 80px;
+    padding-left: 60px;
+    padding-right: 60px;
+    font-size: larger;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.custom-table {
+    margin-top: 30px;
+}
+.custom-table thead th {
+  background: #232323;
+  border: none;
+  font-weight: 600;
+  color: white;
+  padding: 10px;
+}
+
+.custom-table tbody tr {
+  background: #272727;
+  color: white;
+  border: none;
+}
+
+.custom-table tbody tr:nth-child(even) {
+  background: #282828;
+}
+
+.custom-table td {
+    background-color: #171717;
+    border: none !important;
+    padding: 12px 10px;
+    color: white;
+    padding-right: 20px;
+}
+
+.custom-table a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.custom-table a:hover {
+  text-decoration: none;
+  color: white;
+}
+
+#results a:hover {
+    color: rgb(181, 181, 181);
+}
+#display table {
+    background-color: #000;   /* Black background */
+    color: #fff;              /* White text */
+    border: 1px solid #fff;   /* White border */
+}
+
+#display table th,
+#display table td {
+    background-color: #000;   /* Black cells */
+    color: #fff;              /* White text */
+    border: 1px solid #fff;   /* White cell borders */
+}
+
+/* Optional: make table headers slightly gray for contrast */
+#display table th {
+    background-color: #111;
+}
+
+/* Info table (first table) styling */
+#display table:first-of-type {
+    border: none;              /* remove outer border */
+    background-color: #111;    /* dark background */
+    color: #fff;               /* white text */
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+/* Info table cells */
+#display table:first-of-type th,
+#display table:first-of-type td {
+    border: none;              /* remove inner borders */
+    padding: 8px 12px;         /* spacing */
+}
+
+/* Optional: subtle row hover effect for readability */
+#display table:first-of-type tr:hover {
+    background-color: #222;
+}
+
+/* Grades table (second table) styling */
+#display table:nth-of-type(2) {
+    background-color: #000;    /* black background */
+    color: #fff;               /* white text */
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+/* Grades table cells */
+#display table:nth-of-type(2) th,
+#display table:nth-of-type(2) td {
+    border: 1px solid #fff;    /* keep borders */
+    padding: 8px 12px;
+}
+
+/* Header styling for grades table */
+#display table:nth-of-type(2) th {
+    background-color: #111;
+    font-weight: bold;
+}
+
+/* Hover effect for grades table */
+#display table:nth-of-type(2) tr:hover {
+    background-color: #222;
+}
+
+/* Optional: striped rows for grades table */
+#display table:nth-of-type(2) tbody tr:nth-child(even) {
+    background-color: #0d0d0d;
+}
