@@ -59,35 +59,26 @@ app.get("/display/:id", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "views", "display.html"));
 });
 
-app.get("/api/display/:id", async (req, res) => {
+const axios = require("axios");
+
+pp.get("/api/display/:id", async (req, res) => {
   const apogeeId = req.params.id;
 
-  const py = spawn("python", [
-    "utilities/script.py",
-    "--apogee",
-    apogeeId
-  ]);
+  try {
+    // Call your Flask API instead of running Python
+    const response = await axios.get(`http://localhost:10000/grades`, {
+      params: { apogee: apogeeId }
+    });
 
-  let output = "";
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(response.data);
 
-  py.stdout.on("data", (data) => {
-    output += data.toString();
-  });
-
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-
-  py.on("close", (code) => {
-    if (output) {
-      res.send(output);
-    } else {
-      res.status(500).send('<p class="text-danger">No grades found.</p>');
-    }
-  });
-
-  py.stderr.on("data", (data) => {
-    console.error(data.toString());
-  });
+  } catch (error) {
+    console.error("Error fetching grades:", error.message);
+    res.status(500).send('<p class="text-danger">No grades found.</p>');
+  }
 });
+
 
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'views', 'login.html'));

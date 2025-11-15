@@ -7,6 +7,7 @@ import urllib3
 from bs4 import BeautifulSoup
 import csv
 import io
+from flask import Flask, request, Response
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -313,11 +314,56 @@ def run_for_apogee_over_years(apogee_number, years=(2002,2003,2004,2005,2006,200
 
     return 0
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run grades bot over years 2002-2007 and print CSV to stdout.")
-    parser.add_argument("--apogee", required=True, help="Apogee number / login")
-    parser.add_argument("--workers", type=int, default=8, help="ThreadPool max workers (server-safe default 8)")
-    args = parser.parse_args()
+from flask import Flask, request, Response
 
-    exit_code = run_for_apogee_over_years(args.apogee, years=(2001,2002,2003,2004,2005,2006,2007), max_workers=args.workers)
-    sys.exit(exit_code)
+app = Flask(__name__)
+
+@app.route("/grades", methods=["GET"])
+def get_grades():
+    apogee_number = request.args.get("apogee")
+    if not apogee_number:
+        return "Missing apogee parameter", 400
+
+    max_workers = int(request.args.get("workers", 8))
+    years = [2001,2002,2003,2004,2005,2006,2007]
+
+    bot = UAEWebsiteBot()
+    found_date = None
+
+    # Brute-force login over years
+    for y in years:
+        result = bot.brute_force_dates(apogee_number, y, max_workers=max_workers)
+        if result:
+            found_date = result
+            break
+
+    if not found_date:
+        return "Could not find valid birth date", 404
+
+    html = bot.finalize_login_and_get_grades(apogee_number, found_date)
+    if not html:
+        return "Failed to retrieve grades page", 500
+
+    student_info_rows = bot.extract_student_info(html)
+    grades_rows = bot.extract_table(html)
+
+    def rows_to_html_table(rows):
+        if not rows:
+            return "<p>No data available.</p>"
+        html = "<table class='table table-bordered'>"
+        html += "<thead><tr>" + "".join(f"<th>{h}</th>" for h in rows[0]) + "</tr></thead>"
+        html += "<tbody>"
+        for row in rows[1:]:
+            html += "<tr>" + "".join(f"<td>{c}</td>" for c in row) + "</tr>"
+        html += "</tbody></table>"
+        return html
+
+    info_html = rows_to_html_table(student_info_rows)
+    grades_html = rows_to_html_table(grades_rows)
+    full_html = info_html + "<br><br>" + grades_html
+
+    return Response(full_html, mimetype="text/html")
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
