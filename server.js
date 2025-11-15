@@ -61,7 +61,7 @@ app.get("/display/:id", (req, res) => {
 
 const axios = require("axios");
 
-pp.get("/api/display/:id", async (req, res) => {
+app.get("/api/display/:id", async (req, res) => {
   const apogeeId = req.params.id;
 
   try {
