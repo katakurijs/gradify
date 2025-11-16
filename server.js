@@ -7,7 +7,7 @@ const UAParser = require("ua-parser-js");
 const axios = require("axios");
 
 const app = express();
-
+app.set("trust proxy", true);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
@@ -49,10 +49,20 @@ async function getIPInfo(ip) {
   }
 }
 
-// GLOBAL VISITOR LOGGER
-app.use(async (req, res, next) => {
+// ESCAPE HTML
+function escapeHtml(str) {
+  return String(str || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// HOME PAGE
+app.get('/', async (req, res) => {
   const ipRaw = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const ip = ipRaw.split(",")[0].trim();
+  const ip = req.headers["x-real-ip"] || req.ip;
 
   const parser = new UAParser(req.headers["user-agent"]);
   const ua = parser.getResult();
@@ -70,40 +80,16 @@ Device: ${ua.device.type || "Desktop"}
 Browser: ${ua.browser.name || "Unknown"}
 OS: ${ua.os.name || "Unknown"}
 
-Page: ${req.originalUrl}
+Page: /
 Referer: ${req.headers.referer || "Direct"}
 Time: ${new Date().toISOString()}
-
-User-Agent:
-${req.headers["user-agent"]}
 `;
 
-  await sendVisitorEmail(message);
-  next();
+  sendVisitorEmail(message);
+
+  res.sendFile(path.join(__dirname, 'public', 'views', 'index.html'));
 });
 
-// ESCAPE HTML
-function escapeHtml(str) {
-  return String(str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-// HOME PAGE
-app.get("/", async (req, res) => {
-  const visitorIP = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const userAgent = req.headers["user-agent"];
-  const time = new Date().toISOString();
-
-  await sendVisitorEmail(
-    `New visitor on homepage\nIP: ${visitorIP}\nUser-Agent: ${userAgent}\nTime: ${time}`
-  );
-
-  res.sendFile(path.join(__dirname, "public", "views", "index.html"));
-});
 
 // SEARCH PAGE
 app.get("/search", (req, res) => {
